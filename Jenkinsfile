@@ -32,7 +32,7 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
+                steps {
                 sh '''
                 cd /home/ubuntu/mean-app/Mean
                 docker-compose pull
