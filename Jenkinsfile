@@ -11,7 +11,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/yourusername/mean-repo.git'
+                git 'https://github.com/devashih/Mean.git'
             }
         }
 
