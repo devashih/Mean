@@ -11,17 +11,17 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/<your-username>/mean-crud-devops-deployment.git'
+                git 'https://github.com/yourusername/mean-repo.git'
             }
         }
 
-        stage('Build Backend Image') {
+        stage('Build Backend') {
             steps {
                 sh 'docker build -t $DOCKERHUB_REPO/mean-backend:$IMAGE_TAG ./backend'
             }
         }
 
-        stage('Build Frontend Image') {
+        stage('Build Frontend') {
             steps {
                 sh 'docker build -t $DOCKERHUB_REPO/mean-frontend:$IMAGE_TAG ./frontend'
             }
@@ -37,7 +37,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy on EC2') {
             steps {
                 sh '''
                 cd /home/ubuntu/mean-app
