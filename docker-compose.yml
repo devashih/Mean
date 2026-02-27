@@ -1,39 +1,20 @@
-version: '3.8'
+version: '3'
 
 services:
   mongo:
-    image: mongo:6
-    container_name: mongo
+    image: mongo
     restart: always
-    volumes:
-      - mongo-data:/data/db
 
   backend:
-    image: asura0009/mean-backend:latest
-    container_name: backend
+    image: asura0009/backend
     restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/testdb
+    ports:
+      - "8080:8080"
     depends_on:
       - mongo
 
   frontend:
-    image: asura0009/mean-frontend:latest
-    container_name: frontend
-    restart: always
-    depends_on:
-      - backend
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
+    image: asura0009/frontend
     restart: always
     ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    depends_on:
-      - frontend
-
-volumes:
-  mongo-data:
+      - "3000:80"
