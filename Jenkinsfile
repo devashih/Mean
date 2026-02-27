@@ -2,16 +2,16 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_USER = "yourdockerhubusername"
-        IMAGE_BACKEND = "yourdockerhubusername/backend"
-        IMAGE_FRONTEND = "yourdockerhubusername/frontend"
+        DOCKER_USER = "asura0009"
+        IMAGE_BACKEND = "asura0009/backend"
+        IMAGE_FRONTEND = "asura0009/frontend"
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/yourusername/mean-devops-project.git'
+                git 'https://github.com/devashih/Mean.git'
             }
         }
 
