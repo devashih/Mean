@@ -3,58 +3,56 @@ pipeline {
 
     environment {
         DOCKER_USER = "asura0009"
-        IMAGE_BACKEND = "asura0009/backend"
-        IMAGE_FRONTEND = "asura0009/frontend"
+        BACKEND_IMAGE = "asura0009/backend"
+        FRONTEND_IMAGE = "asura0009/frontend"
     }
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git 'https://github.com/devashih/Mean.git'
+                checkout scm
             }
         }
 
-        stage('Build Backend Image') {
+        stage('Build Backend') {
             steps {
-                sh 'docker build -t $IMAGE_BACKEND ./backend'
+                sh 'docker build -t $BACKEND_IMAGE ./backend'
             }
         }
 
-        stage('Build Frontend Image') {
+        stage('Build Frontend') {
             steps {
-                sh 'docker build -t $IMAGE_FRONTEND ./frontend'
+                sh 'docker build -t $FRONTEND_IMAGE ./frontend'
             }
         }
 
-        stage('Login to DockerHub') {
+        stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
+                    credentialsId: 'dockerhub',
                     usernameVariable: 'asura0009',
                     passwordVariable: 'asura009$'
                 )]) {
-                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
                 }
             }
         }
 
         stage('Push Images') {
             steps {
-                sh 'docker push $IMAGE_BACKEND'
-                sh 'docker push $IMAGE_FRONTEND'
+                sh 'docker push $BACKEND_IMAGE'
+                sh 'docker push $FRONTEND_IMAGE'
             }
         }
 
-        stage('Deploy to VM') {
+        stage('Deploy') {
             steps {
                 sh '''
-                ssh ubuntu@your-ec2-ip "
-                    docker pull $IMAGE_BACKEND &&
-                    docker pull $IMAGE_FRONTEND &&
-                    docker-compose down &&
-                    docker-compose up -d
-                "
+                docker pull $BACKEND_IMAGE
+                docker pull $FRONTEND_IMAGE
+                docker-compose down
+                docker-compose up -d
                 '''
             }
         }
