@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+
+  backend:
+    image: /asura0009backend
+    container_name: backend
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+
+  frontend:
+    image: asura0009/frontend
+    container_name: frontend
+    restart: always
+    ports:
+      - "3000:80"
