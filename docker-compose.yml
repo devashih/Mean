@@ -7,7 +7,7 @@ services:
     restart: always
 
   backend:
-    image: /asura0009backend
+    image: asura0009/backend
     container_name: backend
     restart: always
     ports:
