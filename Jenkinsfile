@@ -2,42 +2,59 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-cred')
-        DOCKERHUB_REPO = "asura0009"
-        IMAGE_TAG = "latest"
+        DOCKER_USER = "yourdockerhubusername"
+        IMAGE_BACKEND = "yourdockerhubusername/backend"
+        IMAGE_FRONTEND = "yourdockerhubusername/frontend"
     }
 
     stages {
 
-        stage('Build Backend') {
+        stage('Checkout Code') {
             steps {
-                sh 'docker build -t $DOCKERHUB_REPO/mean-backend:$IMAGE_TAG ./backend'
+                git 'https://github.com/yourusername/mean-devops-project.git'
             }
         }
 
-        stage('Build Frontend') {
+        stage('Build Backend Image') {
             steps {
-                sh 'docker build -t $DOCKERHUB_REPO/mean-frontend:$IMAGE_TAG ./frontend'
+                sh 'docker build -t $IMAGE_BACKEND ./backend'
+            }
+        }
+
+        stage('Build Frontend Image') {
+            steps {
+                sh 'docker build -t $IMAGE_FRONTEND ./frontend'
+            }
+        }
+
+        stage('Login to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'asura0009',
+                    passwordVariable: 'asura009$'
+                )]) {
+                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                }
             }
         }
 
         stage('Push Images') {
             steps {
-                sh '''
-                echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                docker push $DOCKERHUB_REPO/mean-backend:$IMAGE_TAG
-                docker push $DOCKERHUB_REPO/mean-frontend:$IMAGE_TAG
-                '''
+                sh 'docker push $IMAGE_BACKEND'
+                sh 'docker push $IMAGE_FRONTEND'
             }
         }
 
-        stage('Deploy') {
-                steps {
+        stage('Deploy to VM') {
+            steps {
                 sh '''
-                cd /home/ubuntu/mean-app/Mean
-                docker-compose pull
-                docker-compose down
-                docker-compose up -d
+                ssh ubuntu@your-ec2-ip "
+                    docker pull $IMAGE_BACKEND &&
+                    docker pull $IMAGE_FRONTEND &&
+                    docker-compose down &&
+                    docker-compose up -d
+                "
                 '''
             }
         }
