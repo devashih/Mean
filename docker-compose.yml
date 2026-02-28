@@ -1,19 +1,12 @@
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo:latest
-    container_name: mongo
-    restart: always
-
   backend:
     image: asura0009/backend:latest
     container_name: backend
     restart: always
     expose:
       - "8080"
-    depends_on:
-      - mongo
 
   frontend:
     image: asura0009/frontend:latest
