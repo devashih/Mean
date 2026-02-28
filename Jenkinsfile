@@ -2,26 +2,25 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USERNAME = "asura0009"
         BACKEND_IMAGE = "asura0009/backend"
         FRONTEND_IMAGE = "asura0009/frontend"
     }
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Backend Image') {
+        stage('Build Backend') {
             steps {
                 sh 'docker build -t $BACKEND_IMAGE ./backend'
             }
         }
 
-        stage('Build Frontend Image') {
+        stage('Build Frontend') {
             steps {
                 sh 'docker build -t $FRONTEND_IMAGE ./frontend'
             }
@@ -31,12 +30,10 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
                 )]) {
-                    sh """
-                        echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
-                    """
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
                 }
             }
         }
@@ -48,24 +45,15 @@ pipeline {
             }
         }
 
-        stage('Deploy Containers') {
+        stage('Deploy') {
             steps {
                 sh '''
-                    docker pull asura0009/backend
-                    docker pull asura0009/frontend
-                    docker-compose down
-                    docker-compose up -d
+                docker pull asura0009/backend
+                docker pull asura0009/frontend
+                docker-compose down
+                docker-compose up -d
                 '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo "Pipeline executed successfully 🚀"
-        }
-        failure {
-            echo "Pipeline failed ❌ Check console logs."
         }
     }
 }
